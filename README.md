@@ -1,2 +1,2 @@
 # recaman
-Recamán's sequence visualization
+[Recamán's sequence](https://www.youtube.com/watch?v=FGC5TdIiT9U) visualization

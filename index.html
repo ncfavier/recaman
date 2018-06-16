@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Recamán's sequence visualization</title>
+        <style>
+            html, body {
+                --background: #000210;
+                --foreground: #ffffff;
+                overflow-x: hidden;
+                background: var(--background);
+                color: var(--foreground);
+                font-family: sans-serif;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            #scroll-down {
+                position: fixed;
+                bottom: 40px;
+                left: 60px;
+                padding: 16px 16px;
+                border: 3px solid #ff0088;
+                border-radius: 12px;
+                font-size: 4em;
+                font-weight: bold;
+            }
+
+            .hidden {
+                transition: opacity 0.3s ease-in;
+                opacity: 0;
+            }
+
+            .semicircle {
+                --margin: 50px;
+                --spacing: 15px;
+                --size: calc((var(--to) - var(--from)) * var(--spacing));
+                --border-width: 5px;
+                position: absolute;
+                top: calc(var(--from) * var(--spacing) + var(--margin));
+                width: calc(var(--size) / 2);
+                height: calc(var(--size) - var(--border-width));
+                border: var(--border-width) solid hsl(calc(var(--index) * 5 + 200), 100%, 70%);
+                animation: fadeIn 0.6s ease-out;
+            }
+
+            .semicircle:nth-child(odd) {
+                right: 50%;
+                border-right: 0;
+                border-top-left-radius: var(--size);
+                border-bottom-left-radius: var(--size);
+            }
+
+            .semicircle:nth-child(even) {
+                left: 50%;
+                border-left: 0;
+                border-top-right-radius: var(--size);
+                border-bottom-right-radius: var(--size);
+            }
+        </style>
+    </head>
+    <body>
+        <div id="scroll-down">↓</div>
+        <script>
+            let sequence = [0];
+
+            function next() {
+                const length = sequence.length;
+                const backwards = sequence[length - 1] - length;
+                const forward = sequence[length - 1] + length;
+
+                if (backwards >= 0 && sequence.indexOf(backwards) < 0)
+                    sequence.push(backwards);
+                else
+                    sequence.push(forward);
+
+                const [from, to] = sequence.slice(-2).sort((a, b) => a - b);
+
+                let element = document.createElement('div');
+
+                element.classList.add('semicircle');
+                element.style.setProperty('--index', length - 1);
+                element.style.setProperty('--from', from);
+                element.style.setProperty('--to', to);
+
+                document.body.appendChild(element);
+            }
+
+            function more(e) {
+                const se = document.scrollingElement;
+                while (se.scrollTop + se.clientHeight > se.scrollHeight - 30) {
+                    if (e.type == 'scroll')
+                        document.querySelector('#scroll-down').classList.add('hidden');
+                    next();
+                }
+            }
+
+            window.addEventListener('load', more);
+            window.addEventListener('scroll', more);
+        </script>
+    </body>
+</html>
